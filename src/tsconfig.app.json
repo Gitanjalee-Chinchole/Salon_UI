@@ -1,0 +1,24 @@
+{
+  "extends": "../tsconfig.json",
+  "compilerOptions": {
+    "outDir": "../out-tsc/app",
+    "baseUrl": "./",
+    "module": "es2015",
+    "types": []
+  },
+  "exclude": [
+    "test.ts",
+    "**/*.spec.ts",
+    "./app/starter/starter-content/starter-content.component.ts",
+    "./app/starter/starter-control-sidebar/*",
+    "./app/starter/starter-footer/*",
+    "./app/starter/starter-header/*",
+    "./app/starter/starter-left-side/*",
+    "../node_modules/time-ago-pipe/time-ago-pipe.ts!"
+  ],
+  "paths": {
+    "@angular/": [
+      "../node_modules/@angular/*"
+    ]
+  }
+}

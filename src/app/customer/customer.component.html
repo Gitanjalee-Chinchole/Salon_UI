@@ -1,0 +1,367 @@
+<div class="content-wrapper">
+  <div>
+    <toaster-container [toasterconfig]="config1"></toaster-container>
+  </div>
+  <!-- Content Header (Page header) -->
+  <section class="content-header">
+    <h1>
+      Customer
+      <small>Add/Edit Customer</small>
+    </h1>
+    <ol class="breadcrumb">
+      <li>
+        <a href="#">
+          <i class="fa fa-dashboard"></i> Dashboard</a>
+      </li>
+      <li class="master/customer">Customer</li>
+    </ol>
+  </section>
+
+  <!-- Main content -->
+  <section class="content">
+
+
+    <div class="customer">
+      <!-- <button (click)="ClickButton()"> Login</button> -->
+      <div class="row">
+        <div class="col-md-6 margin-bottom">
+          <a (click)="show=!show" class="btn bg-red new-customer">Add New</a>
+        </div>
+        <div class="col-md-6 dropdown margin-bottom ">
+          <button type="button" data-toggle="dropdown" class="btn btn-success dropdown-toggle pull-right">Export
+            <span class="caret"></span>
+          </button>
+          <ul class="dropdown-menu pull-right">
+            <li>
+              <a href="javascript:void(0)">Excel</a>
+            </li>
+            <li>
+              <a href="javascript:void(0)" (click)="generatePDF()">PDF</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+      <div id="customerFormDiv" *ngIf="show" @slideIn>
+        <form [formGroup]="form" (ngSubmit)="onSubmit()">
+          <div class="row customer-box">
+            <div class="col-md-12">
+              <div class="box box-primary">
+                <div class="box-body">
+                  <div class="row">
+                    <div class="col-md-offset-10 col-md-2">
+                      <label for="">Customer ID:
+                      </label>
+                      {{formEditMode!=true ? nextRecordId : editId}}
+                      <span></span>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col-md-2">
+                      <div class="form-group">
+                        <label for="">Title</label>
+                        <div class="input-group">
+                          <div class="input-group-addon">
+                            <i class="ion ion-person"></i>
+                          </div>
+                          <select name="title" id="title" placeholder="Title" value="" class="form-control input-sm" formControlName="title" aria-hidden="true">
+                            <option value=""> </option>
+                            <option value="1">Mr.</option>
+                            <option value="2">Ms.</option>
+                            <option value="3">Mrs.</option>
+                          </select>
+
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-md-5">
+                      <div class="form-group ">
+                        <label for="">Name
+                          <span style="color: red;">*</span>
+                        </label>
+                        <div class="input-group">
+                          <div class="input-group-addon">
+                            <i class="ion ion-person"></i>
+                          </div>
+                          <input type="text" name="name" placeholder="Name" formControlName="name" class="form-control  input-sm">
+                        </div>
+                        <show-errors [control]="form.controls.name"></show-errors>
+                      </div>
+                    </div>
+                    <div class="col-md-5">
+                      <div class="form-group">
+                        <label for="">Spouse</label>
+                        <div class="input-group">
+                          <div class="input-group-addon">
+                            <i class="ion ion-ios-person"></i>
+                          </div>
+                          <input type="text" name="spouse" placeholder="Spouse" formControlName="spouse" class="form-control  input-sm">
+                        </div>
+
+                        <show-errors [control]="form.controls.spouse"></show-errors>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col-md-3">
+                      <div class="form-group">
+                        <label for="">Birthday</label>
+                        <my-date-picker name="mydate" formControlName="birthday" [options]="myDatePickerOptions" placeholder="Birthday" [(ngModel)]="model"></my-date-picker>
+                        <show-errors [control]="form.controls.birthday"></show-errors>
+                      </div>
+                    </div>
+                    <div class="col-md-3">
+                      <div class="form-group">
+                        <label for="">Anniversary</label>
+                        <my-date-picker name="anniversarydate" formControlName="anniversary" [options]="myDatePickerOptions" placeholder="Anniversary Date"
+                          [(ngModel)]="anniversarydate"></my-date-picker>
+                        <show-errors [control]="form.controls.anniversary"></show-errors>
+                      </div>
+                    </div>
+                    <div class="col-md-3">
+                      <div class="form-group ">
+                        <label for="">Phone</label>
+                        <div class="input-group">
+                          <div class="input-group-addon">
+                            <i class="ion ion-ios-telephone"></i>
+                          </div>
+                          <input type="text" name="phone" formControlName="phone" placeholder="e.g: 1234-4567893625" class="form-control  input-sm">
+                        </div>
+                        <show-errors [control]="form.controls.phone"></show-errors>
+                      </div>
+                    </div>
+                    <div class="col-md-3">
+                      <div class="form-group ">
+                        <label for="">Mobile
+                          <span style="color: red;">*</span>
+                        </label>
+                        <div class="input-group">
+                          <div class="input-group-addon">
+                            <i class="ion ion-iphone"></i>
+                          </div>
+
+                          <input type="text" name="mobile" formControlName="mobile" placeholder="e.g: 9150568942" class="form-control  input-sm mobile"
+                            maxlength="10">
+                        </div>
+                        <show-errors [control]="form.controls.mobile"></show-errors>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col-md-6">
+                      <div class="form-group ">
+                        <label for="">Address
+                          <span style="color: red;">*</span>
+                        </label>
+                        <textarea name="address" id="" rows="4" placeholder="Address" formControlName="address" class="form-control  input-sm fix-textarea"></textarea>
+                        <show-errors [control]="form.controls.address"></show-errors>
+                      </div>
+                    </div>
+                    <div class="col-md-6 no-margin no-padding">
+                      <div class="col-md-6 no-margin">
+                        <div class="form-group">
+                          <label for="">Fax</label>
+                          <div class="input-group">
+                            <div class="input-group-addon">
+                              <i aria-hidden="true" class="fa fa-fax"></i>
+                            </div>
+                            <input type="text" name="fax" formControlName="fax" placeholder="Fax" class="form-control  input-sm" maxlength="14">
+                          </div>
+                          <show-errors [control]="form.controls.fax"></show-errors>
+                        </div>
+                      </div>
+                      <div class="col-md-6">
+                        <div class="form-group ">
+                          <label for="">Email</label>
+                          <div class="input-group">
+                            <div class="input-group-addon">
+                              <i class="ion ion-at"></i>
+                            </div>
+                            <input type="text" name="email" formControlName="email" placeholder="Email" class="form-control input-sm">
+                          </div>
+                          <show-errors [control]="form.controls.email"></show-errors>
+                        </div>
+                      </div>
+                      <div class="col-md-6">
+                        <div class="form-group">
+                          <label for="">City</label>
+                          <div class="input-group">
+                            <div class="input-group-addon">
+                              <i class="ion ion-location"></i>
+                            </div>
+                            <input type="text" name="city" formControlName="city" placeholder="City" class="form-control  input-sm">
+                          </div>
+                          <show-errors [control]="form.controls.city"></show-errors>
+                        </div>
+                      </div>
+                      <div class="col-md-6">
+                        <div class="form-group">
+                          <label for="">Nationality</label>
+                          <div class="input-group">
+                            <div class="input-group-addon">
+                              <i class="ion ion-location"></i>
+                            </div>
+                            <input type="text" formControlName="nationality" name="nationality" placeholder="Nationality" class="form-control  input-sm">
+                          </div>
+                          <show-errors [control]="form.controls.nationality"></show-errors>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="box-footer">
+                  <div class="form-group">
+                    <button type="submit" class="btn btn-primary" [disabled]="form.invalid">
+                      <i class="fa fa-floppy-o"></i>
+                      {{formEditMode!=true ? 'Save' : 'Update'}}</button>
+                    <a class="btn btn-cyan" (click)="resetForm()">
+                      <i class="fa fa-refresh"></i> Reset</a>
+                    <a (click)="resetForm()" data-toggle="collapse" data-target="#customerFormDiv" class="btn btn-danger add-customer">Cancel</a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+      <div id="customerHistory" class="collapse">
+        <div class="row">
+          <div class="col-md-12 table-responsive">
+            <div id="DataTables_Table_0_wrapper" class="dataTables_wrapper form-inline dt-bootstrap">
+              <div class="row">
+                <div class="col-sm-6">
+                  <div class="dataTables_length" id="DataTables_Table_0_length">
+                    <label>Show
+                      <select name="DataTables_Table_0_length" aria-controls="DataTables_Table_0" class="form-control input-sm">
+                        <option value="10">10</option>
+                        <option value="25">25</option>
+                        <option value="50">50</option>
+                        <option value="100">100</option>
+                      </select> entries</label>
+                  </div>
+                </div>
+                <div class="col-sm-6">
+                  <div id="DataTables_Table_0_filter" class="dataTables_filter">
+                    <label>Search:
+                      <input type="search" class="form-control input-sm" placeholder="" aria-controls="DataTables_Table_0">
+                    </label>
+                  </div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-sm-12">
+                  <table class="table table-bordered table-striped datatable-order dataTable" width="100%">
+                    <thead>
+                      <tr>
+                        <th style="width: 7px;" class="sorting_desc">#</th>
+                        <th class="sorting">Date</th>
+                        <th class="sorting">Service Name</th>
+                        <th class="sorting">Service Description</th>
+                        <th class="sorting">Stylist</th>
+                        <th class="sorting">Charges</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td colspan="6" class="text-center">No customers History Available</td>
+                      </tr>
+                      <tr>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="row" *ngIf="!show" @slideIn>
+        <div class="col-md-12 table-responsive">
+          <div id="DataTables_Table_0_wrapper" class="dataTables_wrapper form-inline dt-bootstrap">
+            <div class="row">
+              <div class="col-sm-6">
+                <div class="dataTables_length" id="DataTables_Table_0_length">
+                  <label>Show
+                    <select name="DataTables_Table_0_length" [(ngModel)]="ddlitemsPerPage" (change)="setItemsPerPage()" aria-controls="DataTables_Table_0"
+                      class="form-control input-sm">
+                      <option value="10">10</option>
+                      <option value="25">25</option>
+                      <option value="50">50</option>
+                      <option value="100">100</option>
+                    </select> entries</label>
+                </div>
+              </div>
+              <div class="col-sm-6">
+                <div id="DataTables_Table_0_filter" class="dataTables_filter">
+                  <label>Search:
+                    <input type="search" #box (keyup.enter)="onEnter(box.value)" class="form-control input-sm" placeholder="" aria-controls="DataTables_Table_0">
+                  </label>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-sm-12">
+                <table class="table table-bordered table-striped datatable-order dataTable">
+                  <thead>
+                    <tr>
+                      <th>
+                        <a class="text-white" [routerLink]="['/master/customer']" [queryParams]="sortDir == 'desc' && sortCol =='id' ?{sort:'id', dir:'asc' }:{sort:'id', dir:'desc'} ">#</a>
+                        <i class="{{ sortCol == 'id' && sortDir == 'desc' ? 'fa fa-sort-desc' : 'fa fa-sort-asc'}} pull-right" aria-hidden="true"></i>
+                      </th>
+                      <th class="sorting">
+                        <a class="text-white" [routerLink]="['/master/customer']" [queryParams]="sortDir == 'desc' && sortCol =='name' ?{sort:'name', dir:'asc' }:{sort:'name', dir:'desc'} ">Name</a>
+                        <i class="{{ sortCol == 'name' && sortDir == 'desc' ? 'fa fa-sort-desc' : 'fa fa-sort-asc'}} pull-right" aria-hidden="true"></i>
+                      </th>
+                      <th class="sorting">
+                        <a class="text-white" [routerLink]="['/master/customer']" [queryParams]="sortDir == 'desc' && sortCol =='mobile' ?{sort:'mobile', dir:'asc' }:{sort:'mobile', dir:'desc'} ">Mobile</a>
+                        <i class="{{ sortCol == 'mobile' && sortDir == 'desc' ? 'fa fa-sort-desc' : 'fa fa-sort-asc'}} pull-right" aria-hidden="true"></i>
+                      </th>
+                      <th class="sorting">
+                        <a class="text-white" [routerLink]="['/master/customer']" [queryParams]="sortDir == 'desc' && sortCol =='city' ?{sort:'city', dir:'asc' }:{sort:'city', dir:'desc'} ">City</a>
+                        <i class="{{ sortCol == 'city' && sortDir == 'desc' ? 'fa fa-sort-desc' : 'fa fa-sort-asc'}} pull-right" aria-hidden="true"></i>
+                      </th>
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr *ngIf="customers!=null &&  customers.length==0">
+                      <td colspan="9" class="text-center">No customers Available</td>
+                    </tr>
+                    <tr *ngFor="let customer of customers | paginate: { itemsPerPage: itemsPerPage, currentPage: pageIndex , totalItems: totalItems};let i=index;">
+                      <td>{{customer.id }}</td>
+                      <td>{{customer.name}}</td>
+                      <td>{{customer.mobile}}</td>
+                      <td>{{customer.city}}</td>
+                      <td style="width:12%">
+                        <a title="Customer History" class="btn btn-xs btn-info" data-toggle="collapse" data-target="#customerHistory">
+                          <i class="fa fa-history" aria-hidden="true"></i>
+                        </a>
+                        <a class="btn btn-xs btn-info btn-circle" href="javascripts:void(0)" (click)="getEditCustomer(customer.id)">
+                          <i aria-hidden="true" class="fa fa-pencil"></i>
+                        </a>
+                        <a class="btn btn-xs btn-danger btn-circle" href="javascripts:void(0)" (click)="deleteCustomer(customer.id)">
+                          <i aria-hidden="true" class="fa fa-trash"></i>
+                        </a>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+                <div class="pull-right">
+                  <pagination-controls (pageChange)="getPage($event)"></pagination-controls>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- end #customer div -->
+  </section>
+</div>

@@ -1,0 +1,777 @@
+<popup>
+  <form [formGroup]="duplicateItemsForm" (ngSubmit)="uploadDuplicateItems()">
+    <table class="table table-bordered table-striped">
+      <thead>
+        <tr>
+          <th>Item/Product</th>
+          <th>Barcode</th>
+          <th>Item Type</th>
+          <th>Category</th>
+          <th>Unit</th>
+          <th>S.P.</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+
+      <tbody formArrayName="items">
+
+        <tr [ngClass]="ditem.value['type']" [formGroupName]="i" *ngFor="let ditem of duplicateItemsForm.get('items')['controls']; let i = index;">
+
+          <td>
+            <input class="form-control input-sm" formControlName="itemName" placeholder="Item name">
+          </td>
+          <td>
+            <input class="form-control input-sm" formControlName="barcode" placeholder="Barcode"> </td>
+          <td>
+            <select tabindex="-1" formControlName="itemType" class="form-control input-sm" aria-hidden="true">
+              <option value="" selected="selected">Please Select</option>
+              <option class="" value="Product">Product</option>
+              <option class="" value="Service">Service</option>
+              <option class="" value="Consumable">Consumable</option>
+            </select>
+          </td>
+          <td>
+            <input class="form-control input-sm" formControlName="category" placeholder="Category">
+          </td>
+          <td>
+            <input class="form-control input-sm" formControlName="unit" placeholder="Unit">
+          </td>
+          <td>
+            <input class="form-control input-sm" formControlName="salePrice" placeholder="S.P.">
+          </td>
+          <td>
+            <a class="btn btn-xs btn-danger btn-circle ">
+              <i aria-hidden="true" (click)="deleteDuplicateItem(i)" class="fa fa-trash"></i>
+            </a>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="row">
+      <div class="col-md-12" style="text-align: right;">
+        <button type="submit" class="btn btn-success">Submit</button>
+        <button type="button" (click)="cancelPopup()" class="btn btn-default">Cancel</button>
+      </div>
+    </div>
+  </form>
+</popup>
+<div class="content-wrapper">
+  <div>
+    <toaster-container [toasterconfig]="config1"></toaster-container>
+  </div>
+
+
+
+  <!-- Content Header (Page header) -->
+  <section class="content-header">
+    <h1>
+      Item
+      <small>Add/Edit Item</small>
+    </h1>
+    <ol class="breadcrumb">
+      <li>
+        <a href="#">
+          <i class="fa fa-dashboard"></i> Dashboard</a>
+      </li>
+      <li class="master/item">Item</li>
+    </ol>
+  </section>
+
+  <section class="content" style="position:relative">
+    <spinner-component [spinnerShow]="spinner">
+      <div class="spinner">
+        <div class="cube1"></div>
+        <div class="cube2"></div>
+      </div>
+    </spinner-component>
+
+
+    <div class="item">
+      <div class="row">
+        <div class="col-md-6 margin-bottom">
+          <a class="btn bg-red new-item" (click)="show=!show">Add New</a>
+          <!-- <a data-toggle="modal" (click)="openImportItemsDialog()" data-target="#purchase-import" class="btn btn-indigo horizontal-margin">
+            <i aria-hidden="true" class="fa fa-upload"></i> Import Items</a> -->
+          <a data-toggle="modal" (click)="openImportItemsDialog()" data-target="#" class="btn btn-indigo horizontal-margin">
+            <i aria-hidden="true" class="fa fa-upload"></i> Import Items</a>
+          <button class="btn btn-success" (click)="uploadItems()">
+            <span class="glyphicon glyphicon-upload"></span> Upload</button>
+
+          <input type="file" #importItemsfileInput style="opacity:0" (change)="readExcelFile($event)" #input />
+
+        </div>
+        <div class="col-md-6 dropdown margin-bottom ">
+          <button type="button" data-toggle="dropdown" class="btn btn-success dropdown-toggle pull-right horizontal-margin">Export
+            <span class="caret"></span>
+          </button>
+          <ul class="dropdown-menu pull-right">
+            <li>
+              <a href="javasvripts:void(0)" (click)="exportToExcel()">Excel</a>
+            </li>
+            <li>
+              <a href="javasvripts:void(0)" (click)="exportToPDF()">PDF</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+      <div id="itemFormDiv1" *ngIf="show" @slideIn>
+        <form [formGroup]="itemForm" (ngSubmit)="onSubmit()">
+          <div class="row customer-box">
+            <div class="col-md-12">
+              <div class="box box-primary">
+                <div class="box-body">
+                  <div class="row">
+                    <div class="col-md-9">
+                      <div class="row">
+                        <div class="col-md-offset-10 col-md-2">
+                          <label for="title">Item No.</label>
+                          <span>
+                            {{nextRecordId}}
+                          </span>
+                        </div>
+                      </div>
+                      <div class="row">
+                        <div class="col-md-4">
+                          <div class="form-group">
+                            <label for="title">Category</label>
+                            <label></label>
+                            <select tabindex="-1" class="form-control input-sm" formControlName="parentCategory" (change)="onChange($event.target.value)"
+                              aria-hidden="true">
+                              <option value="0" selected="selected">Please Select</option>
+                              <option *ngFor="let item of parentCategories" class="" value="{{item.id}}">{{item.categorie}}</option>
+
+                            </select>
+
+                          </div>
+                        </div>
+                        <div class="col-md-4">
+                          <div class="form-group">
+                            <label for="title">Sub Category</label>
+                            <label>
+                              <span style="color: red;">*</span>
+                            </label>
+                            <select required="" tabindex="-1" formControlName="category" class="form-control input-sm" aria-hidden="true">
+                              <option value="" selected="selected">Please Select</option>
+                              <option *ngFor="let item of childCategories" class="" value="{{item.id}}">{{item.categorie}}</option>
+                            </select>
+                            <span *ngIf="!itemForm.get('category').valid && itemForm.get('category').dirty " class="text-red">Please select
+                              <b>category</b>
+                            </span>
+                          </div>
+                        </div>
+                        <div class="col-md-4">
+                          <div class="form-group">
+                            <label for="title">P & S Type</label>
+                            <div class="input-group">
+                              <div class="input-group-addon">
+                                <i class="icon ion-ios-pricetags"></i>
+                              </div>
+                              <select tabindex="-1" formControlName="itemType" class="form-control input-sm" aria-hidden="true">
+                                <option value="" selected="selected">Please Select</option>
+                                <option class="" value="Product">Product</option>
+                                <option class="" value="Service">Service</option>
+                                <option class="" value="Consumable">Consumable</option>
+                              </select>
+                            </div>
+                            <show-errors [control]="itemForm.controls.itemType"></show-errors>
+                            <!---->
+                          </div>
+                        </div>
+                      </div>
+                      <div class="row">
+                        <div class="col-md-6">
+                          <div class="form-group">
+                            <label for="title">Item/Product</label>
+                            <label>
+                              <span style="color: red;">*</span>
+                            </label>
+                            <div class="input-group">
+                              <div class="input-group-addon">
+                                <i class="icon ion-bag"></i>
+                              </div>
+                              <input name="item" placeholder="Item/Product" formControlName="itemName" required="required" class="form-control input-sm">
+                            </div>
+                            <show-errors [control]="itemForm.controls.itemName"></show-errors>
+                          </div>
+                        </div>
+                        <div class="col-md-6">
+                          <div class="form-group">
+                            <label for="title">Barcode</label>
+                            <label>
+                              <span style="color: red;">*</span>
+                            </label>
+                            <div class="input-group">
+                              <div class="input-group-addon">
+                                <i aria-hidden="true" class="fa fa-barcode"></i>
+                              </div>
+                              <input name="barcode" formControlName="barcode" (focusout)="updateItemBarcode()" placeholder="Barcode" class="form-control input-sm">
+                            </div>
+                            <show-errors [control]="itemForm.controls.barcode"></show-errors>
+                            <!-- <span *ngIf="!itemForm.get('barcode').valid && itemForm.get('barcode').dirty && itemForm.get('barcode').hasError('required')"
+                              class="text-red">Barcode is
+                              <b>required</b>
+                            </span>
+                            <span *ngIf="!itemForm.get('barcode').valid && itemForm.get('barcode').dirty && itemForm.get('barcode').hasError('nospace')  "
+                              class="text-red">Space
+                              <b>not allowed</b>
+                            </span>
+                            <span *ngIf="!itemForm.get('barcode').valid && itemForm.get('barcode').dirty && itemForm.get('barcode').hasError('minlength')  "
+                              class="text-red">Barcode lenght at least
+                              <b>1</b>
+                            </span> -->
+                          </div>
+                        </div>
+                      </div>
+                      <div class="row">
+                        <div class="col-md-3">
+                          <div class="form-group">
+                            <label for="title">Product Code</label>
+                            <label>
+                              <div class="input-group">
+                                <div class="input-group-addon">
+                                  <i class="icon ion-ios-pricetags"></i>
+                                </div>
+                                <input type="text" name="productCode" formControlName="productCode" placeholder="Product Code" class="input-sm form-control input">
+                              </div>
+                              <!---->
+                            </label>
+                          </div>
+                        </div>
+                        <div class="col-md-3">
+                          <div class="form-group">
+                            <label for="title">Serial Number</label>
+                            <div class="input-group">
+                              <div class="input-group-addon">
+                                <i class="icon ion-ios-pricetags"></i>
+                              </div>
+                              <input type="text" name="serial_number" formControlName="serialNumber" placeholder="Serial Number" class="input-sm form-control">
+                            </div>
+                          </div>
+                        </div>
+                        <div class="col-md-3">
+                          <div class="form-group ">
+                            <label for="title">C.P.</label>
+                            <label></label>
+                            <div class="input-group">
+                              <div class="input-group-addon">
+                                <i class="fa fa-money"></i>
+                              </div>
+                              <input type="text" name="cp" formControlName="costPrice" placeholder="C.P." maxlength="8" class="form-control input-sm" aria-required="false"
+                                aria-invalid="true">
+                            </div>
+                            <show-errors [control]="itemForm.controls.costPrice"></show-errors>
+                          </div>
+                        </div>
+                        <div class="col-md-3">
+                          <div class="form-group">
+                            <label for="title">S.P.</label>
+                            <label>
+                              <span style="color: red;">*</span>
+                            </label>
+                            <div class="input-group ">
+                              <div class="input-group-addon">
+                                <i class="fa fa-money"></i>
+                              </div>
+                              <input type="text" name="sp" formControlName="salePrice" placeholder="S.P." maxlength="8" required="required" class="form-control input-sm decimal"
+                                aria-required="false" aria-invalid="true">
+                            </div>
+                            <show-errors [control]="itemForm.controls.salePrice"></show-errors>
+                            <!-- <span *ngIf="!itemForm.get('salePrice').valid && itemForm.get('salePrice').dirty " class="help is-danger">Must be
+                              <b>numeric</b>
+                            </span> -->
+
+                          </div>
+                        </div>
+                      </div>
+                      <div class="row">
+                        <div class="col-md-6">
+                          <div class="form-group">
+                            <label for="title">Description</label>
+                            <textarea name="description" formControlName="description" rows="4" placeholder="Description" class="form-control input-sm fix-textarea"></textarea>
+                          </div>
+                        </div>
+                        <div class="col-md-3">
+                          <div class="row">
+                            <div class="col-md-12">
+                              <div class="form-group">
+                                <label for="title">Unit</label>
+                                <label>
+                                  <span style="color: red;">*</span>
+                                </label>
+                                <div class="input-group">
+                                  <div class="input-group-addon">
+                                    <i aria-hidden="true" class="fa fa-th-large"></i>
+                                  </div>
+                                  <select name="unit" required="required" formControlName="unit" class="form-control input-sm" aria-required="true" aria-invalid="false">
+                                    <option value="">Select Unit</option>
+                                    <option value="1" *ngFor="let unit of units" value="{{unit.id}}">{{unit.unit}}</option>
+                                  </select>
+                                </div>
+                                <span *ngIf="!itemForm.get('unit').valid && itemForm.get('unit').dirty " class="help is-danger">Please select
+                                  <b>unit</b>
+                                </span>
+                              </div>
+                            </div>
+                            <div class="col-md-12">
+                              <div class="form-group">
+                                <label for="title">Stock</label>
+                                <div class="input-group">
+                                  <div class="input-group-addon">
+                                    <i class="fa fa-stack-overflow"></i>
+                                  </div>
+                                  <input type="text" name="stock" formControlName="stock" placeholder="Stock" class="form-control input-sm">
+                                </div>
+                                <span class="help is-danger" style="display: none;"></span>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="col-md-3">
+                          <div class="row">
+                            <div class="col-md-12">
+                              <div class="form-group">
+                                <label for="title">Min</label>
+                                <label></label>
+                                <div class="input-group">
+                                  <div class="input-group-addon">
+                                    <i aria-hidden="true" class="fa fa-th-large"></i>
+                                  </div>
+                                  <input placeholder="Min" maxlength="5" formControlName="min" name="min" type="text" class="form-control input-sm" aria-required="false"
+                                    aria-invalid="true">
+                                </div>
+                                <show-errors [control]="itemForm.controls.min"></show-errors>
+                              </div>
+                            </div>
+                            <div class="col-md-12">
+                              <div class="form-group">
+                                <label for="title">Max.</label>
+                                <label></label>
+                                <div class="input-group">
+                                  <div class="input-group-addon">
+                                    <i class="fa fa-stack-overflow"></i>
+                                  </div>
+                                  <input placeholder="Max." maxlength="5" formControlName="max" name="max" type="text" class="form-control input-sm" aria-required="false"
+                                    aria-invalid="true">
+                                </div>
+                                <show-errors [control]="itemForm.controls.max"></show-errors>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="row">
+                        <div class="col-md-6">
+                          <div class="form-group">
+                            <label for="title">Stylist Commision Rate</label>
+                            <div class="input-group ">
+                              <div class="input-group-addon">
+                                <i class="fa fa-money"></i>
+                              </div>
+                              <input type="text" name="commisionRate" formControlName="stylistCommRate" placeholder="0.00" class="form-control input-sm decimal"
+                                aria-required="false" aria-invalid="true">
+                            </div>
+                            <show-errors [control]="itemForm.controls.stylistCommRate"></show-errors>
+                          </div>
+                        </div>
+                        <div class="col-md-4">
+                          <div class="form-group">
+                            <label for="title">Time</label>
+                            <div class="input-group ">
+                              <div class="input-group-addon">
+                                <i class="fa fa-clock-o"></i>
+                              </div>
+                              <!-- <input #apptime class="form-control" a2e-datetimepicker [date]="dateTo" [options]="a2eOptions" (onChange)="dateToChange($event)"
+                                formControlName="serviceTime" /> -->
+                              <input type="text" name="time" formControlName="serviceTime" maxlength="5" placeholder="00:00" class="form-control input-sm">
+                            </div>
+                            <show-errors [control]="itemForm.controls.serviceTime"></show-errors>
+                          </div>
+                        </div>
+                        <div class="col-md-2" style="margin-top: 1%;">
+                          <!-- <label for="expiryId">Ingredient Service</label>
+                          <input id="ingredientCheck" name="ingredientCheck" type="checkbox"> -->
+                        </div>
+                      </div>
+                      <div id="ingredientAdd">
+                        <div class="row">
+                          <div class="col-md-12">
+                            <h4>Ingredients Used For 1 Service</h4>
+                          </div>
+                        </div>
+                        <div class="row">
+                          <div class="col-md-6">
+                            <div class="form-group">
+                              <label for="title">Item</label>
+                              <div class="input-group">
+                                <div class="input-group-addon">
+                                  <i class="icon ion-bag"></i>
+                                </div>
+                                <input ngui-auto-complete [source]="searchIngredients.bind(this)" #seachvalue [list-formatter]="autocompleListFormatter"
+                                  value-property-name="id" blank-option-text=' ' display-property-name="itemName" placeholder="Search ingredients"
+                                  [ngModel]="searchbox" [ngModelOptions]="{standalone: true}" (valueChanged)="ingredientSelected($event)"
+                                  class="form-control input-sm">
+                                <!-- <select style="" tabindex="-1" class="form-control input-sm" aria-hidden="true">
+                                  <option value="0" selected="selected">Please Select</option>
+
+
+
+                                </select> -->
+                              </div>
+                            </div>
+                          </div>
+                          <div class="col-md-4">
+                            <div class="form-group">
+                              <label for="title">Quantity</label>
+                              <div class="input-group ">
+                                <div class="input-group-addon">
+                                  <i class="icon ion-ios-pricetags"></i>
+                                </div>
+                                <input type="text" name="sp" placeholder="Quantity" [ngModelOptions]="{standalone: true}" [(ngModel)]="serviceQuantity" maxlength="8"
+                                  required="required" class="form-control input-sm decimal" aria-required="false" aria-invalid="true">
+                              </div>
+
+                            </div>
+                          </div>
+                          <div class="col-md-2" style="margin-top:3%">
+                            <!-- <a class="btn bg-purple ">Add New</a> -->
+                          </div>
+                        </div>
+                        <div class="row">
+                          <div class="col-md-12">
+                            <table class="table table-bordered table-striped datatable-order dataTable" width="100%">
+                              <thead>
+                                <tr>
+                                  <th style="width: 7px;" class="sorting_desc">#</th>
+                                  <th class="sorting">BarCode</th>
+                                  <th class="sorting">Name</th>
+                                  <th class="sorting">Quantity</th>
+                                  <th class="sorting">Actions</th>
+                                </tr>
+                              </thead>
+                              <tbody formArrayName="item_ingredients">
+                                <tr *ngIf="serviceList === null || serviceList.length ===0 ">
+                                  <td colspan="5" class="text-center">No Records</td>
+                                </tr>
+                                <tr [formGroupName]="i" *ngFor="let ingd of itemForm.get('item_ingredients')['controls'];let i=index">
+                                  <ng-template [ngIf]="ingd.value['deleted']==false">
+                                    <td> {{ i+1 }} </td>
+                                    <td>{{ ingd.value['itemObj']['barcode'] }}</td>
+                                    <td>{{ ingd.value['itemObj']['itemName'] }}</td>
+                                    <td>
+                                      <input type="text" formControlName="quantity" class='form-control input-sm' name="" id="" placeholder="Quantity"> </td>
+                                    <td>
+                                      <a (click)="removeService(i)" class="btn btn-xs btn-danger btn-circle ">
+                                        <i aria-hidden="true" class="fa fa-trash"></i>
+                                      </a>
+                                    </td>
+                                  </ng-template>
+                                </tr>
+                              </tbody>
+                            </table>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-md-3">
+                      <div class="row text-center">
+                        <div class="col-md-12">
+                          <div style="height:60px">
+                            <span *ngIf="itembarcode != ''">
+                              <ngx-barcode [bc-value]="itembarcode" [bc-format]=" 'CODE128' || '' " [bc-display-value]="true" [bc-height]="25" [bc-width]="1"
+                                [bc-margin-left]="10" [bc-font-size]="10"></ngx-barcode>
+                            </span>
+                          </div>
+                          <div class="col-md-12">
+                            <div class="profile-action">
+                              <img id="productImg" [src]="imageSrc" class="img-thumbnail img-responsive" style="margin: auto;">
+                              <a class="change-profile" style="color: black;">
+                                <i aria-hidden="true" class="fa fa-camera fa-lg" id="itemPic" (click)="openFileUploadDialig()"></i>
+                              </a>
+                              <input type="file" #fileInput style="opacity:0" (change)="fileUpload($event)" placeholder="Upload file" accept=".jpg,.png">
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                    </div>
+                  </div>
+
+
+
+                </div>
+                <div class="box-footer">
+                  <div class="form-group">
+                    <button id="add-button" type="submit" class="btn btn-primary ">
+                      <i class="fa fa-floppy-o"></i> {{ formEditMode == true ? 'Update' : 'Save' }} </button>
+                    <button id="update-button" type="submit" class="btn btn-primary " style="display: none;">
+                      <i class="fa fa-floppy-o"></i> Update</button>
+                    <a class="btn btn-cyan" (click)="resetForm()">
+                      <i class="fa fa-refresh"></i> Reset</a>
+                    <a class="btn btn-danger" (click)="show=false;resetForm()">Cancel</a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="row" *ngIf="!show" @slideIn>
+
+        <!-- <button type="button" class="btn btn-success btn-s" (click)="uploader.uploadAll()" [disabled]="!uploader.getNotUploadedItems().length">
+          <span class="glyphicon glyphicon-upload"></span> Upload all
+        </button> -->
+        <div class="col-md-12 table-responsive item-master-table no-search">
+
+          <div class="col-md-12 form-inline">
+            <div class="col-md-6">
+              <div class="dataTables_length" id="DataTables_Table_0_length">
+                <label>Show
+                  <select name="DataTables_Table_0_length" [(ngModel)]="ddlitemsPerPage" (change)="setItemsPerPage()" aria-controls="DataTables_Table_0"
+                    class="form-control input-sm">
+                    <option [ngValue]="10">10</option>
+                    <option [ngValue]="25">25</option>
+                    <option [ngValue]="75">75</option>
+                    <option [ngValue]="100">100</option>
+                  </select> entries</label>
+              </div>
+            </div>
+            <div class="col-md-6">
+
+              <div class="pull-right">
+
+                <!-- <form id="form-search-item" methode="GET" style="margin-bottom: 10px;">
+                  <button class="btn btn-success input-sm" (click)="exportToPDF()">
+                    <span class="fa fa-file-pdf-o"></span> Export To PDF
+                  </button>
+                  <button class="btn btn-success input-sm" (click)="exportToExcel()">
+                    <span class="fa fa-file-excel-o"></span> Export To Excel</button>
+                </form> -->
+                <label for="search">Search :</label>
+                <input type="text" #box (keyup.enter)="onEnter(box.value)" name="searchkey" value="" placeholder="search" class="form-control  input-sm seatch-item">
+
+              </div>
+            </div>
+          </div>
+          <div id="DataTables_Table_0_wrapper" class="dataTables_wrapper form-inline dt-bootstrap">
+            <div class="row">
+              <div class="col-sm-6">as</div>
+              <div class="col-sm-6">
+                <div id="DataTables_Table_0_filter" class="dataTables_filter">
+                  <label>Search:
+                    <input type="search" class="form-control input-sm" placeholder="" aria-controls="DataTables_Table_0">
+                  </label>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-sm-12">
+                <table class="table table-bordered table-striped datatable-paging-false dataTable" id="DataTables_Table_0" role="grid" aria-describedby="DataTables_Table_0_info">
+
+                  <thead>
+                    <tr role="row">
+                      <th style="width: 7%;">
+                        <a class="text-white" [routerLink]="['/master/item']" [queryParams]="sortDir == 'desc' && sortCol =='id' ?{sort:'id', dir:'asc' }:{sort:'id', dir:'desc'} ">Item No</a>
+                        <i class="{{ sortCol == 'id' && sortDir == 'desc' ? 'fa fa-sort-desc' : 'fa fa-sort-asc'}} pull-right" aria-hidden="true"></i>
+                      </th>
+                      <th>
+                        <a class="text-white" [routerLink]="['/master/item']" [queryParams]="sortDir == 'desc' && sortCol =='barcode' ?{sort:'barcode', dir:'asc' }:{sort:'barcode', dir:'desc'} ">Barcode</a>
+                        <i class="{{ sortCol == 'barcode' && sortDir == 'desc' ? 'fa fa-sort-desc' : 'fa fa-sort-asc'}} pull-right" aria-hidden="true"></i>
+                      </th>
+                      <th>
+                        <a class="text-white" [routerLink]="['/master/item']" [queryParams]="sortDir == 'desc' && sortCol =='category' ?{sort:'category', dir:'asc' }:{sort:'category', dir:'desc'} ">Category</a>
+                        <i class="{{ sortCol == 'category' && sortDir == 'desc' ? 'fa fa-sort-desc' : 'fa fa-sort-asc'}} pull-right" aria-hidden="true"></i>
+                      </th>
+                      <th>
+                        <a class="text-white" [routerLink]="['/master/item']" [queryParams]="sortDir == 'desc' && sortCol =='itemName' ?{sort:'itemName', dir:'asc' }:{sort:'itemName', dir:'desc'} ">Item/Product</a>
+                        <i class="{{ sortCol == 'itemName' && sortDir == 'desc' ? 'fa fa-sort-desc' : 'fa fa-sort-asc'}} pull-right" aria-hidden="true"></i>
+                      </th>
+                      <th>
+                        <a class="text-white" [routerLink]="['/master/item']" [queryParams]="sortDir == 'desc' && sortCol =='costPrice' ?{sort:'costPrice', dir:'asc' }:{sort:'costPrice', dir:'desc'} ">C.P.</a>
+                        <i class="{{ sortCol == 'costPrice' && sortDir == 'desc' ? 'fa fa-sort-desc' : 'fa fa-sort-asc'}} pull-right" aria-hidden="true"></i>
+                      </th>
+                      <th>
+                        <a class="text-white" [routerLink]="['/master/item']" [queryParams]="sortDir == 'desc' && sortCol =='salePrice' ?{sort:'sale', dir:'asc' }:{sort:'salePrice', dir:'desc'} ">S.P.</a>
+                        <i class="{{ sortCol == 'salePrice' && sortDir == 'desc' ? 'fa fa-sort-desc' : 'fa fa-sort-asc'}} pull-right" aria-hidden="true"></i>
+                      </th>
+                      <th>
+                        <a class="text-white" [routerLink]="['/master/item']" [queryParams]="sortDir == 'desc' && sortCol =='unit' ?{sort:'unit', dir:'asc' }:{sort:'unit', dir:'desc'} ">Unit</a>
+                        <i class="{{ sortCol == 'unit' && sortDir == 'desc' ? 'fa fa-sort-desc' : 'fa fa-sort-asc'}} pull-right" aria-hidden="true"></i>
+                      </th>
+                      <th>
+                        <a class="text-white" [routerLink]="['/master/item']" [queryParams]="sortDir == 'desc' && sortCol =='stock' ?{sort:'stock', dir:'asc' }:{sort:'stock', dir:'desc'} ">Stock</a>
+                        <i class="{{ sortCol == 'stock' && sortDir == 'desc' ? 'fa fa-sort-desc' : 'fa fa-sort-asc'}} pull-right" aria-hidden="true"></i>
+                      </th>
+                      <th>
+                        <a class="text-white" [routerLink]="['/master/item']" [queryParams]="sortDir == 'desc' && sortCol =='min' ?{sort:'min', dir:'asc' }:{sort:'min', dir:'desc'} ">Min</a>
+                        <i class="{{ sortCol == 'min' && sortDir == 'desc' ? 'fa fa-sort-desc' : 'fa fa-sort-asc'}} pull-right" aria-hidden="true"></i>
+                      </th>
+                      <th>
+                        <a class="text-white" [routerLink]="['/master/item']" [queryParams]="sortDir == 'desc' && sortCol =='max' ?{sort:'max', dir:'asc' }:{sort:'max', dir:'desc'} ">Max.</a>
+                        <i class="{{ sortCol == 'max' && sortDir == 'desc' ? 'fa fa-sort-desc' : 'fa fa-sort-asc'}} pull-right" aria-hidden="true"></i>
+                      </th>
+                      <th style="width: 8%;">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr *ngIf="items.length == 0" class="text-center">
+                      <td colspan="11">No Records</td>
+                    </tr>
+                    <tr *ngFor="let item of items | paginate: { itemsPerPage: itemsPerPage, currentPage: pageIndex , totalItems: totalItems}">
+                      <td>{{ item.id }}</td>
+                      <td>{{ item.barcode }}</td>
+                      <td>{{ item.category == null ? ' ' : item.category.categorie }}</td>
+                      <td>{{ item.itemName }}</td>
+                      <td>{{ item.costPrice }}</td>
+                      <td>{{ item.salePrice }}</td>
+                      <td>{{ item.unit.unit }}</td>
+                      <td>{{ item.stock }}</td>
+                      <td>{{ item.min }}</td>
+                      <td>{{ item.max }}</td>
+                      <td style="width:8%">
+                        <a (click)="getItemToEdit(item.id)" class="btn btn-xs btn-info btn-circle">
+                          <i aria-hidden="true" class="fa fa-pencil"></i>
+                        </a>
+                        <a href="javascript:void(0)" class="btn btn-xs btn-danger btn-circle " (click)="deleteItem(item.id)">
+                          <i aria-hidden="true" class="fa fa-trash"></i>
+                        </a>
+                      </td>
+                    </tr>
+                    <!-- <tr role="row" class="odd">
+                      <td class="sorting_1">1</td>
+
+                      <td>Test</td>
+                      <td>Abc</td>
+                      <td>400.00</td>
+                      <td>600.00</td>
+                      <td>PC</td>
+                      <td>135.450</td>
+                      <td>0.000</td>
+                      <td>0.000</td>
+                      <td style="width:12%">
+                        <a class="btn btn-xs btn-info btn-circle">
+                          <i aria-hidden="true" class="fa fa-pencil"></i>
+                        </a>
+                        <a class="btn btn-xs btn-danger btn-circle ">
+                          <i aria-hidden="true" class="fa fa-trash"></i>
+                        </a>
+                      </td>
+                    </tr> -->
+
+
+
+
+                  </tbody>
+                  <!-- <tfoot class="showSearch">
+                    <tr>
+                      <th rowspan="1" colspan="1">Item No.</th>
+
+                      <th class="search" rowspan="1" colspan="1">
+                        <input type="text" style="width:100px" class="form-control input-sm" placeholder=" Category">
+                      </th>
+                      <th class="search" rowspan="1" colspan="1">
+                        <input type="text" style="width:129px" class="form-control input-sm" placeholder=" Item/Product">
+                      </th>
+                      <th class="search" rowspan="1" colspan="1">
+                        <input type="text" style="width:61px" class="form-control input-sm" placeholder=" C.P.">
+                      </th>
+                      <th class="search" rowspan="1" colspan="1">
+                        <input type="text" style="width:60px" class="form-control input-sm" placeholder=" S.P.">
+                      </th>
+                      <th class="search" rowspan="1" colspan="1">
+                        <input type="text" style="width:57px" class="form-control input-sm" placeholder=" Unit">
+                      </th>
+                      <th class="search" rowspan="1" colspan="1">
+                        <input type="text" style="width:65px" class="form-control input-sm" placeholder=" Stock">
+                      </th>
+                      <th class="search" rowspan="1" colspan="1">
+                        <input type="text" style="width:50px" class="form-control input-sm" placeholder=" Min">
+                      </th>
+                      <th class="search" rowspan="1" colspan="1">
+                        <input type="text" style="width:55px" class="form-control input-sm" placeholder=" Max.">
+                      </th>
+                      <th style="width: 4%;" rowspan="1" colspan="1">Actions</th>
+                    </tr>
+                  </tfoot> -->
+                </table>
+                <div class="pull-right">
+                  <pagination-controls (pageChange)="getPage($event)"></pagination-controls>
+                </div>
+              </div>
+            </div>
+            <!-- <div class="row">
+              <div class="col-sm-5">
+                <div class="dataTables_info" id="DataTables_Table_0_info" role="status" aria-live="polite">Showing 1 to 7 of 7 entries</div>
+              </div>
+              <div class="col-sm-7"></div>
+            </div> -->
+          </div>
+          <div class="pull-right"></div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-12">
+          <div id="purchase-import" role="dialog" class="modal fade">
+            <div class="modal-dialog" style="width: 60%;">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <button type="button" data-dismiss="modal" class="close">×</button>
+                  <h4 class="modal-title">Import Items</h4>
+                </div>
+                <div class="modal-body">
+                  <div class="form-group">
+                    <input type="file" id="upload__file" accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
+                      class="file">
+                    <div class="input-group col-md-12">
+                      <span class="input-group-addon">
+                        <i aria-hidden="true" class="fa fa-file-excel-o"></i>
+                      </span>
+                      <input type="text" id="file-alt" placeholder="Upload Excel sheet" class="form-control input-sm">
+                      <span class="input-group-btn">
+                        <button type="button" (click)="openImportItemsDialog()" class="browse btn btn-primary input-sm">
+                          <span class="replace">
+                            <i class="glyphicon glyphicon-search"></i> Browse </span>
+                        </button>
+                      </span>
+                    </div>
+                  </div>
+                  <div class="progress progress-sm active" style="width: 95%; float: left;">
+                    <div role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" class="progress-bar progress-bar-success  progress-bar-striped active"
+                      style="width: 0%;"></div>
+                  </div>
+                  <span style="font-size: 11px; float: right; display: none;">0%</span>
+                  <div class="row" style="display: none;">
+                    <div class="col-md-12">
+                      <div class="table-responsive fixed-screen-scroll">
+                        <table class="table table-bordered">
+                          <thead>
+                            <tr>
+                              <th>Category</th>
+                              <th>Item Name</th>
+
+                              <th>Unit</th>
+                              <th>Quantity</th>
+                              <th>Sale Price</th>
+                              <th>Cost Price</th>
+                              <th>Action</th>
+                            </tr>
+                          </thead>
+                          <tbody></tbody>
+                        </table>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="modal-footer">
+                  <button class="btn btn-primary pull-left">Save</button>
+                  <button class="btn bg-cyan pull-left">Reset</button>
+                  <button type="button" data-dismiss="modal" class="btn btn-default">Close</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</div>

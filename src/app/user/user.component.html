@@ -1,0 +1,245 @@
+<div class="content-wrapper">
+  <div>
+    <toaster-container [toasterconfig]="config1"></toaster-container>
+  </div>
+  <!-- Content Header (Page header) -->
+  <section class="content-header">
+    <h1>
+      User
+      <small>Add/Edit User</small>
+    </h1>
+    <ol class="breadcrumb">
+      <li>
+        <a href="#">
+          <i class="fa fa-dashboard"></i> Dashboard</a>
+      </li>
+      <li class="master/user">User</li>
+    </ol>
+  </section>
+  <section class="content">
+
+
+    <div id="users">
+      <div class="row">
+        <div class="col-md-6 margin-bottom">
+          <a (click)="show =!show" class="btn bg-red new-user" aria-expanded="true">Add New</a>
+        </div>
+        <div class="col-md-6 dropdown margin-bottom ">
+          <button type="button" data-toggle="dropdown" class="btn btn-success dropdown-toggle pull-right">Export
+            <span class="caret"></span>
+          </button>
+          <ul class="dropdown-menu pull-right">
+            <li>
+              <a href="#">Excel</a>
+            </li>
+            <li>
+              <a href="javascript:void(0)" (click)="exportToPDF()">PDF</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+      <div id="userFormDiv" *ngIf="show" @slideIn>
+        <form [formGroup]="form" (ngSubmit)="OnSubmit()">
+          <input name="_token" type="hidden">
+          <div class="row customer-box">
+            <div class="col-md-12">
+              <div class="box box-primary">
+                <div class="box-body">
+                  <div class="row">
+                    <div class="col-md-4">
+                      <div class="form-group ">
+                        <label for="username">Username</label>
+                        <span style="color: red;">*</span>
+                        <div class="input-group">
+                          <div class="input-group-addon">
+                            <i class="ion ion-person"></i>
+                          </div>
+                          <input placeholder="Username" name="name" type="text" id="name" class="form-control input-sm" formControlName="username">
+                        </div>
+                        <show-errors [control]="form.controls.username"></show-errors>
+                      </div>
+
+                    </div>
+                  </div>
+
+                  <div class="row">
+                    <div class="col-md-3">
+                      <div class="form-group ">
+                        <label for="password">Password</label>
+                        <span *ngIf="!formEditMode" style="color: red;">*</span>
+                        <div class="input-group">
+                          <div class="input-group-addon">
+                            <i class="ion-android-lock"></i>
+                          </div>
+                          <input required="required" placeholder="Password" name="password" type="password" value="" id="password" class="form-control input-sm"
+                            formControlName="password" [formGroup]="form">
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-md-3">
+                      <div class="form-group">
+                        <label for="password-confirm">Confirm Password</label>
+                        <span *ngIf="!formEditMode" style="color: red;">*</span>
+                        <div class="input-group">
+                          <div class="input-group-addon">
+                            <i class="ion-android-lock"></i>
+                          </div>
+                          <input required="required" placeholder="Confirm Password" formControlName="confirmPassword" name="password_confirmation"
+                            type="password" value="" class="form-control input-sm">
+                        </div>
+                        <div class="text-red" *ngIf="form.controls['confirmPassword'].errors?.MatchPassword">Password not match</div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col-md-3">
+                      <div class="form-group">
+                        <label for="title">Assign Role</label>
+                        <span style="color: red;">*</span>
+                        <div class="input-group">
+                          <div class="input-group-addon">
+                            <i class="fa fa-user-plus"></i>
+                          </div>
+                          <select name="role" class="form-control input-sm" tabindex="-1" aria-hidden="true" formControlName="role">
+                            <option value=''>Select Role</option>
+                            <option value="{{role.id}}" *ngFor="let role of roles">{{role.role}}</option>
+                          </select>
+                        </div>
+                        <show-errors [control]="form.controls.role"></show-errors>
+                      </div>
+                    </div>
+                    <div class="col-md-3">
+                      <div class="form-group">
+                        <label for="title">Assign Floor</label>
+                        <div class="input-group">
+                          <div class="input-group-addon">
+                            <i class="fa fa-list-ol"></i>
+                          </div>
+                          <select name="floor" class="form-control input-sm " tabindex="-1" aria-hidden="true" formControlName="floor">
+                            <option value=''>Select Floor</option>
+                            <option value="Floor 1">Floor 1</option>
+                            <option value="Floor 2">Floor 2</option>
+                            <option value="Floor 3">Floor 3</option>
+                          </select>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="box-footer">
+                  <div class="form-group">
+                    <button type="submit" class="btn btn-primary">
+                      <i class="fa fa-floppy-o"></i>
+                      {{formEditMode!=true ? 'Save' : 'Update'}}</button>
+                    <a class="btn btn-cyan" (click)="reset()">
+                      <i class="fa fa-refresh"></i> Reset</a>
+                    <a data-toggle="collapse" data-target="#userFormDiv" class="btn btn-danger add-customer" aria-expanded="true" (click)="cancel()">
+                      Cancel </a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="row" *ngIf="!show" @slideIn>
+        <div class="col-md-12 table-responsive">
+          <div id="DataTables_Table_0_wrapper" class="dataTables_wrapper form-inline dt-bootstrap">
+            <div class="row">
+              <div class="col-sm-6">
+                <div class="dataTables_length" id="DataTables_Table_0_length">
+                  <label>Show
+                    <select name="DataTables_Table_0_length" [(ngModel)]="ddlusersPerPage" (change)="setusersPerPage()" aria-controls="DataTables_Table_0"
+                      class="form-control input-sm">
+                      <option value="10">10</option>
+                      <option value="25">25</option>
+                      <option value="50">50</option>
+                      <option value="100">100</option>
+                    </select> entries</label>
+                </div>
+              </div>
+              <div class="col-sm-6">
+                <div id="DataTables_Table_0_filter" class="pull-right">
+                  <label>Search:
+                    <input type="search" class="form-control input-sm" placeholder="" #box (keyup.enter)="onEnter(box.value)" aria-controls="DataTables_Table_0">
+                  </label>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-sm-12">
+                <table data-sort-order="desc" data-sort-col="0" class="table table-bordered table-striped datatable-order dataTable" id="DataTables_Table_0"
+                  role="grid" aria-describedby="DataTables_Table_0_info">
+                  <thead>
+                    <tr role="row ">
+                      <th style="width: 7px;">#</th>
+                      <th class="sorting ">
+                        <a class="text-white " [routerLink]="[ '/master/user']" [queryParams]="sortDir == 'desc' && sortCol =='username' ?{sort:'username', dir:'asc' }:{sort:'username', dir:'desc'} ">Username</a>
+                        <i class="{{ sortCol == 'username' && sortDir == 'desc' ? 'fa fa-sort-desc' : 'fa fa-sort-asc'}} pull-right" aria-hidden="true"></i>
+                      </th>
+                      <th class="sorting ">
+                        <a class="text-white " [routerLink]="[ '/master/user']" [queryParams]="sortDir == 'desc' && sortCol =='role' ?{sort:'role', dir:'asc' }:{sort:'role', dir:'desc'} ">Assign Role</a>
+                        <i class="{{ sortCol == 'role' && sortDir == 'desc' ? 'fa fa-sort-desc' : 'fa fa-sort-asc'}} pull-right" aria-hidden="true"></i>
+                      </th>
+                      <th>Assign Floor</th>
+                      <th class="sorting ">
+                        <a class="text-white " [routerLink]="[ '/master/user']" [queryParams]="sortDir == 'desc' && sortCol =='created_at' ?{sort:'created_at', dir:'asc' }:{sort:'created_at', dir:'desc'} ">Created Date</a>
+                        <i class="{{ sortCol == 'created_at' && sortDir == 'desc' ? 'fa fa-sort-desc' : 'fa fa-sort-asc'}} pull-right" aria-hidden="true"></i>
+                      </th>
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr role="row " class="odd " *ngFor="let user of users | paginate: { itemsPerPage: usersPerPage, currentPage: pageIndex , totalItems: totalUsers}; let i=index ">
+                      <td class="sorting_1 ">{{ user.id }}</td>
+                      <td>{{user.username}}</td>
+                      <td>{{user.role.role}}</td>
+                      <td>{{user.floor}}</td>
+                      <td>{{user.created_at | date: 'MMMM, d, y'}}
+                        <br>
+                        <em>
+                          <small>
+                            Last updated {{ user.updated_at | timeAgo }}
+                          </small>
+                        </em>
+                      </td>
+                      <td style="width:12% ">
+                        <a href="javascript:void(0) " class="btn btn-xs btn-info btn-circle " (click)="getEditUsers(user.id) ">
+                          <i aria-hidden="true " class="fa fa-pencil "></i>
+                        </a>
+                        <a class="btn btn-xs btn-danger btn-circle " (click)="deleteUser(user.id) ">
+                          <i aria-hidden="true " class="fa fa-trash "></i>
+                        </a>
+                      </td>
+                    </tr>
+                  </tbody>
+                  <!--  <tfoot class="showSearch">
+                    <tr>
+                      <th style="width: 10%;" rowspan="1" colspan="1">#</th>
+                      <th class="search" rowspan="1" colspan="1">
+                        <input type="text" style="width:148px" class="form-control input-sm" placeholder=" Username">
+                      </th>
+                      <th class="search" rowspan="1" colspan="1">
+                        <input type="text" style="width:162px" class="form-control input-sm" placeholder=" Assign Role">
+                      </th>
+                      <th class="search" rowspan="1" colspan="1">
+                        <input type="text" style="width:171px" class="form-control input-sm" placeholder=" Assign Floor">
+                      </th>
+                      <th rowspan="1" colspan="1">Created Date</th>
+                      <th style="width: 10%;" rowspan="1" colspan="1">Actions</th>
+                    </tr>
+                  </tfoot> -->
+                </table>
+                <div class="pull-right ">
+                  <pagination-controls (pageChange)="getPage($event) "></pagination-controls>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </section>
+</div>

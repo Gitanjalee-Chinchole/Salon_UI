@@ -1,0 +1,300 @@
+<div class="content-wrapper">
+  <!-- Content Header (Page header) -->
+  <div>
+    <toaster-container [toasterconfig]="config1"></toaster-container>
+  </div>
+  <section class="content-header">
+    <h1>
+      Purchase Order
+      <small>Add/Edit Purchase Order</small>
+    </h1>
+    <ol class="breadcrumb">
+      <li>
+        <a href="#">
+          <i class="fa fa-dashboard"></i> Dashboard</a>
+      </li>
+      <li class="stock/purchase_order">Purchase Order</li>
+    </ol>
+  </section>
+  <section class="content">
+
+    <div class="purchase_order">
+      <div class="row">
+        <div class="col-md-12 margin-bottom">
+          <a (click)="show =!show" class="btn bg-red new-customer">Add New</a>
+        </div>
+      </div>
+      <div id="pOrderFormDiv" *ngIf="show" @slideIn>
+        <form [formGroup]="form" (ngSubmit)="onSubmit()" (keydown.enter)="$event.preventDefault()">
+          <div class="row customer-box">
+            <div class="col-md-12">
+              <div class="box box-primary">
+                <div class="box-body">
+                  <div class="row">
+                    <div class="col-md-4">
+                      <div class="form-group">
+                        <label for="mrn_no">Purchase Order Id :</label>
+                        {{nextRecordId}}
+                        <span> </span>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col-md-3">
+                      <div class="form-group">
+                        <label>Purchase order date
+                          <span style="color: red;">*</span>
+                        </label>
+                        <div class="input-group" style="font-size: 2px !important;">
+                          <div class="input-group-addon">
+                            <i class="ion ion-calendar"></i>
+                          </div>
+                          <my-date-picker name="mrn_date" id="mrn_date" placeholder="MRN Date" formControlName="purchase_order_date" [options]="myDatePickerOptions"
+                            [(ngModel)]="model" required></my-date-picker>
+                        </div>
+                        <show-errors [control]="form.controls.purchase_order_date"></show-errors>
+                      </div>
+                    </div>
+                    <div class="col-md-5">
+                      <div class="form-group">
+                        <label>Supplier Name
+                          <span style="color: red;">*</span>
+                        </label>
+                        <div class="input-group">
+                          <div class="input-group-addon">
+                            <i class="fa fa-user"></i>
+                          </div>
+                          <select name="supplier" class="form-control input-sm " formControlName="supplierId">
+                            <option value="">Please Select</option>
+                            <option value="{{supplier.id}}" *ngFor="let supplier of suppliers">{{supplier.company_name}}</option>
+                          </select>
+                        </div>
+                        <show-errors [control]="form.controls.supplierId"></show-errors>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="box" style="border-top: 0px;">
+                    <div class="box-body" style="margin: 1px; border: 2px solid rgb(200, 200, 200); border-radius: 5px;">
+                      <div class="row">
+                        <div class="col-md-3">
+                          <div class="form-group">
+                            <label>Category</label>
+                            <div class="input-group">
+                              <div class="input-group-addon">
+                                <i class="fa fa-tags"></i>
+                              </div>
+                              <select style="" tabindex="-1" class="form-control input-sm" formControlName="parentCategory" (change)="onParentCategoryChange($event.target.value)">
+                                <option value="0">Please Select</option>
+                                <option *ngFor="let item of parentCategory" class="" value="{{item.id}}">{{item.categorie}}</option>
+                                <!---->
+                                <!---->
+                              </select>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="col-md-3">
+                          <div class="form-group">
+                            <label>Sub Category</label>
+                            <div class="input-group">
+                              <div class="input-group-addon">
+                                <i class="fa fa-tags"></i>
+                              </div>
+                              <select style="" tabindex="-1" formControlName="category" class="form-control input-sm">
+                                <option value="">Please Select</option>
+                                <option *ngFor="let item of childCategory" class="" value="{{item.id}}">{{item.categorie}}</option>
+                              </select>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="col-md-3">
+                          <div class="form-group">
+                            <label>Item Name
+                              <span style="color: red;">*</span>
+                            </label>
+                            <div class="input-group">
+                              <div class="input-group-addon">
+                                <i class="icon ion-bag"></i>
+                              </div>
+                              <input ngui-auto-complete [(ngModel)]="searchbox" [ngModelOptions]="{standalone:true}" [source]="searchItem.bind(this)" #searchValue
+                                [list-formatter]="autoCompleteList" (valueChanged)="selectedItems($event)" close-on-focus='false'
+                                match-formatted='true' value-property-name="id" display-property-name="itemName" placeholder="Search Item"
+                                class="form-control input-sm" name="itemName">
+                            </div>
+                          </div>
+                        </div>
+                        <div class="col-md-3">
+                          <div class="form-group">
+                            <label>Quantity
+                              <span style="color: red;">*</span>
+                            </label>
+                            <input type="text" name="quantity" formControlName="quantity" placeholder="Quantity" class="form-control  input-sm">
+                            <show-errors [control]="form.controls.quantity"></show-errors>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="row">
+                        <div class="col-md-1">
+                          <div>
+                            <div class="col-md-2" style="margin-top:2%">
+                              <a class="btn bg-purple " (click)="addArrayList()">
+                                <i class="fa fa-plus"></i> {{itemEditMode!=true ? 'Add' : 'Update'}}</a>
+                            </div>
+                          </div>
+                          <!---->
+                        </div>
+                      </div>
+                      <div class="box-footer">
+                        <div class="row">
+                          <div class="col-md-12 table-responsive ">
+                            <table class="table table-bordered table-striped ">
+                              <thead>
+                                <tr>
+                                  <th>#</th>
+                                  <th>Item Code</th>
+                                  <th>Item Name</th>
+                                  <th>Quantity</th>
+                                  <th style="width: 10%;">Actions</th>
+                                </tr>
+                              </thead>
+                              <tbody formArrayName="purchase_order_item">
+                                <tr *ngIf="orderList === null || orderList.length === 0 ">
+                                  <td colspan="7" class="text-center">No Records</td>
+                                </tr>
+                                <tr *ngFor="let items of form.get('purchase_order_item')['controls'];let i=index">
+                                  <ng-template [ngIf]="items.value['deleted']==false">
+                                    <td> {{ i+1 }} </td>
+                                    <td>{{ items.value['itemObj']['barcode'] }}</td>
+                                    <td>{{ items.value['itemObj']['itemName'] }}</td>
+                                    <td>{{ items.value['quantity'] }}</td>
+                                    <td style="width:8%;">
+                                      <a class="btn btn-xs btn-info btn-circle" (click)="editItems(i)">
+                                        <i aria-hidden="true" class="fa fa-pencil"></i>
+                                      </a>
+                                      <a (click)="deleteItems(i)" class="btn btn-xs btn-danger btn-circle ">
+                                        <i aria-hidden="true" class="fa fa-trash"></i>
+                                      </a>
+                                    </td>
+                                  </ng-template>
+                                </tr>
+                              </tbody>
+                            </table>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col-md-12">
+                      <button id="add-button" type="submit" class="btn btn-primary ">
+                        <i class="fa fa-floppy-o"></i> {{formEditMode!=true ? 'Save' : 'Update'}}</button>
+                      <!---->
+                      <a class="btn btn-cyan" (click)="reset()">
+                        <i class="fa fa-refresh"></i> Reset</a>
+                      <a class="btn  btn-danger" (click)="resetForm()">Cancel</a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="row">
+        <div class="col-md-12 table-responsive pOrder-table " *ngIf="!show" @slideIn>
+          <div id="DataTables_Table_0_wrapper" class="dataTables_wrapper form-inline dt-bootstrap">
+            <div class="row">
+              <div class="col-sm-6">
+                <div class="dataTables_length" id="DataTables_Table_0_length">
+                  <label>Show
+                    <select name="DataTables_Table_0_length" [(ngModel)]="ddlordersPerPage" (change)="setOrdersPerPage()" aria-controls="DataTables_Table_0"
+                      class="form-control input-sm">
+                      <option value="10">10</option>
+                      <option value="25">25</option>
+                      <option value="50">50</option>
+                      <option value="100">100</option>
+                    </select> entries</label>
+                </div>
+              </div>
+              <div class="col-sm-6">
+                <div id="DataTables_Table_0_filter" class="dataTables_filter">
+                  <label>Search:
+                    <input type="search" #box (keyup.enter)="onEnter(box.value)" class="form-control input-sm" placeholder="" aria-controls="DataTables_Table_0">
+                  </label>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-sm-12">
+                <table class="table table-bordered table-striped datatable1 dataTable" id="DataTables_Table_0" role="grid" aria-describedby="DataTables_Table_0_info">
+                  <thead>
+                    <tr role="row">
+                      <th style="width: 5%;">
+                        <a class="text-white" [routerLink]="[ '/stock/purchase_order']" [queryParams]="sortDir == 'desc' && sortCol =='id' ?{sort:'id', dir:'asc' }:{sort:'id', dir:'desc'} ">#</a>
+                        <i class="{{ sortCol == 'id' && sortDir == 'desc' ? 'fa fa-sort-desc' : 'fa fa-sort-asc'}} pull-right" aria-hidden="true"></i>
+                      </th>
+                      <th class="sorting ">
+                        <a class="text-white " [routerLink]="[ '/stock/purchase_order']" [queryParams]="sortDir == 'desc' && sortCol =='purchase_order_date' ?{sort:'purchase_order_date', dir:'asc' }:{sort:'purchase_order_date', dir:'desc'} ">Purchase order date</a>
+                        <i class="{{ sortCol == 'purchase_order_date' && sortDir == 'desc' ? 'fa fa-sort-desc' : 'fa fa-sort-asc'}} pull-right" aria-hidden="true"></i>
+                      </th>
+                      <th class="sorting ">
+                        <a class="text-white " [routerLink]="[ '/stock/purchase_order']" [queryParams]="sortDir == 'desc' && sortCol =='supplierId' ?{sort:'supplierId', dir:'asc' }:{sort:'supplierId', dir:'desc'} ">Supplier Name</a>
+                        <i class="{{ sortCol == 'supplierId' && sortDir == 'desc' ? 'fa fa-sort-desc' : 'fa fa-sort-asc'}} pull-right" aria-hidden="true"></i>
+                      </th>
+                      <th class="sorting ">
+                        <a class="text-white " [routerLink]="[ '/stock/purchase_order']" [queryParams]="sortDir == 'desc' && sortCol =='Status' ?{sort:'Status', dir:'asc' }:{sort:'Status', dir:'desc'} ">Status</a>
+                        <i class="{{ sortCol == 'Status' && sortDir == 'desc' ? 'fa fa-sort-desc' : 'fa fa-sort-asc'}} pull-right" aria-hidden="true"></i>
+                      </th>
+                      <th style="width: 12%;">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr *ngIf="puchaseOrders!=null &&  puchaseOrders.length==0">
+                      <td colspan="9" class="text-center">No Orders Available</td>
+                    </tr>
+                    <tr role="row" class="odd" *ngFor="let order of purchaseOrders |paginate: { itemsPerPage: ordersPerPage, currentPage: pageIndex , totalItems: totalOrders};let
+                    i=index;">
+                      <td class="sorting_1">{{order.id}}</td>
+                      <td>{{order.purchase_order_date | date : 'yyyy-MM-dd' }}</td>
+                      <td>{{order.supplier.company_name}} </td>
+                      <td style="color: green;">{{order.status}}</td>
+                      <td>
+                        <a class="btn btn-xs btn-info btn-circle" (click)="getEditOrder(order.id)">
+                          <i aria-hidden="true" class="fa fa-pencil"></i>
+                        </a>
+
+                        <a class="btn btn-xs btn-danger btn-circle {{ order.status == 'Completed' ? 'disabled' : '' }}" (click)="deleteOrder(order.id)">
+                          <i aria-hidden="true" class="fa fa-trash"></i>
+                        </a>
+                      </td>
+                    </tr>
+                  </tbody>
+                  <!-- <tfoot class="showSearch">
+                    <tr>
+                      <th class="search" rowspan="1" colspan="1">
+                        <input type="text" style="width:293px" class="form-control input-sm" placeholder=" Purchase Order Id">
+                      </th>
+                      <th class="search" rowspan="1" colspan="1">
+                        <input type="text" style="width:315px" class="form-control input-sm" placeholder=" Purchase order date">
+                      </th>
+                      <th class="search" rowspan="1" colspan="1">
+                        <input type="text" style="width:213px" class="form-control input-sm" placeholder=" Supplier Name">
+                      </th>
+                      <th class="search" rowspan="1" colspan="1">
+                        <input type="text" style="width:133px" class="form-control input-sm" placeholder=" Status">
+                      </th>
+                      <th style="width: 15%;" rowspan="1" colspan="1">Actions</th>
+                    </tr>
+                  </tfoot> -->
+                </table>
+                <div class="pull-right ">
+                  <pagination-controls (pageChange)="getPage($event) "></pagination-controls>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </section>
+</div>

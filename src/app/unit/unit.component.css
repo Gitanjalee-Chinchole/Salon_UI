@@ -1,0 +1,9 @@
+tbody>tr {
+  border-left: 3px solid #f9f9f9;
+}
+
+a:hover,
+a:active,
+a:focus {
+  color: white;
+}

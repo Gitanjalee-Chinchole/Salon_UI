@@ -1,0 +1,341 @@
+<div class="content-wrapper">
+  <div>
+    <toaster-container [toasterconfig]="config1"></toaster-container>
+  </div>
+  <!-- Content Header (Page header) -->
+  <section class="content-header">
+    <h1>
+      Opening Stock
+      <small>Add/Edit Stock on Date</small>
+    </h1>
+    <ol class="breadcrumb">
+      <li>
+        <a href="#">
+          <i class="fa fa-dashboard"></i> Dashboard</a>
+      </li>
+      <li class="master/employee">Opening Stock</li>
+    </ol>
+  </section>
+
+  <!-- Main contentes -->
+  <section class="content">
+
+    <div class="open_stock">
+      <div class="row">
+        <div class="col-md-6 margin-bottom">
+          <a class="btn bg-red" (click)="show=!show">Add New</a>
+          <a data-toggle="modal" (click)="openImportItemsDialog()" data-target="#" class="btn btn-indigo horizontal-margin">
+            <i aria-hidden="true" class="fa fa-upload"></i> Import Items</a>
+          <button class="btn btn-success" (click)="uploadItems()">
+            <span class="glyphicon glyphicon-upload"></span> Upload</button>
+
+          <input type="file" #importItemsfileInput style="opacity:0" (change)="readExcelFile($event)" #input />
+        </div>
+        <!-- <div class="col-md-6 dropdown margin-bottom ">
+          <button type="button" data-toggle="dropdown" class="btn btn-success dropdown-toggle pull-right">Export
+            <span class="caret"></span>
+          </button>
+          <ul class="dropdown-menu pull-right">
+            <li>
+              <a href="#">Excel</a>
+            </li>
+            <li>
+              <a href="#">PDF</a>
+            </li>
+          </ul>
+        </div> -->
+      </div>
+      <div id="openstockFormDiv" *ngIf="show" @slideIn>
+        <div class="row customer-box">
+          <div class="col-md-12">
+            <div class="box box-primary">
+              <form [formGroup]="itemForm" (ngSubmit)="onSubmit()">
+                <div class="box-body">
+                  <div class="row">
+                    <div class="col-md-3">
+                      <div class="form-group ">
+                        <label for="open_stock_date">Opening Stock Date</label>
+                        <label>
+                          <span style="color: red;">*</span>
+                        </label>
+                        <my-date-picker name="birthdate" id="birthdate" formControlName="open_stock_date" [options]="myDatePickerOptions"></my-date-picker>
+                        <show-errors [control]="itemForm.controls.open_stock_date"></show-errors>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col-md-3">
+                      <div class="form-group">
+                        <label for="text">Category</label>
+                        <div class="input-group">
+                          <div class="input-group-addon">
+                            <i class="ion-bag"></i>
+                          </div>
+                          <select tabindex="-1" class="form-control input-sm" formControlName="parentCategory" (change)="onParentCategoryChange($event.target.value)"
+                            aria-hidden="true">
+                            <option value='0'>Please Select</option>
+                            <option *ngFor="let item of parentCategories" class="" value="{{item.id}}">{{item.categorie}}</option>
+
+                          </select>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-md-3">
+                      <div class="form-group">
+                        <label for="text">Sub Category</label>
+                        <div class="input-group">
+                          <div class="input-group-addon">
+                            <i class="ion-bag"></i>
+                          </div>
+                          <select required="" tabindex="-1" formControlName="category" class="form-control input-sm" aria-hidden="true">
+                            <option value="" selected="selected">Please Select</option>
+                            <option *ngFor="let item of childCategories" class="" value="{{item.id}}">{{item.categorie}}</option>
+                          </select>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="col-md-3">
+                      <div class="form-group ">
+                        <label for="text">Item</label>
+                        <label>
+                          <span style="color: red;">*</span>
+                        </label>
+                        <div class="input-group">
+                          <div class="input-group-addon">
+                            <i class="ion-bag"></i>
+                          </div>
+                          <input ngui-auto-complete [source]="searchByItemName.bind(this)" [list-formatter]="itemNameFormatter" value-property-name="id"
+                            close-on-focus='false' match-formatted='true' display-property-name="itemName" placeholder="Search Item Name"
+                            (valueChanged)="searchItemSelected($event)" [ngModel]="itemSearch" [ngModelOptions]="{standalone: true}"
+                            class="form-control input-sm" autocomplete="off">
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-md-3">
+                      <!-- <div class="form-group ">
+                        <label for="text">Barcode</label>
+                        <label>
+                        </label>
+                        <div class="input-group">
+                          <div class="input-group-addon">
+                            <i class="ion-bag"></i>
+                          </div>
+                          <input ngui-auto-complete [source]="searchByItemBarcode.bind(this)" #seachvalue [list-formatter]="itemBarcodeFormatter" value-property-name="id"
+                            blank-option-text=' ' display-property-name="barcode" placeholder="Search Item Barcode" class="form-control input-sm">
+
+                        </div>
+                      </div> -->
+                    </div>
+                    <div class="col-md-3">
+                      <div class="form-group ">
+                        <label for="text">Opening Stock</label>
+                        <label>
+                          <span style="color: red;">*</span>
+                        </label>
+                        <div class="input-group">
+                          <div class="input-group-addon">
+                            <i class="ion-ios-box-outline"></i>
+                          </div>
+                          <input type="text" name="openingStock" maxlength="8" formControlName="openingStock" placeholder="Opening Stock" required="required"
+                            class="form-control  input-sm validate-decimal">
+                        </div>
+                        <show-errors [control]="itemForm.controls.openingStock"></show-errors>
+                      </div>
+                    </div>
+                    <div class="col-md-3">
+                      <div class="form-group ">
+                        <label for="text">Unit</label>
+                        <label>
+                          <span style="color: red;">*</span>
+                        </label>
+                        <div class="input-group">
+                          <div class="input-group-addon">
+                            <i aria-hidden="true" class="fa fa-th-large"></i>
+                          </div>
+                          <select name="unit" required="required" formControlName="unitId" class="form-control input-sm" aria-required="true" aria-invalid="false">
+                            <option value="">Select Unit</option>
+                            <option value="1" *ngFor="let unit of units" value="{{unit.id}}">{{unit.unit}}</option>
+                          </select>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+
+
+
+                <div class="box-footer">
+                  <div class="form-group">
+                    <button type="submit" class="btn btn-primary ">
+                      <i class="fa fa-floppy-o"></i>{{ formEditMode ? 'Update' : 'Add' }}</button>
+                    <!---->
+                    <a class="btn btn-cyan" (click)="resetForm()">
+                      <i class="fa fa-refresh"></i> Reset</a>
+                    <a class="btn btn-danger" (click)="show=false;resetForm();">Cancel</a>
+                  </div>
+                </div>
+
+                <div class="box-body" *ngIf="itemForm.get('openingItems')['controls'].length > 0">
+                  <div class="col-sm-12">
+                    <table class="table table-bordered table-striped datatable-paging-false dataTable">
+                      <thead>
+                        <tr role="row">
+                          <th>#</th>
+                          <th>Item Cat</th>
+                          <th>Item Name</th>
+                          <th>Opening Stock</th>
+                          <th>Unit</th>
+                          <th>Actions</th>
+                        </tr>
+                      </thead>
+                      <tbody formArrayName="openingItems">
+                        <tr [formGroupName]="i" *ngFor="let ingd of itemForm.get('openingItems')['controls'];let i=index">
+                          <td>{{ i + 1}} </td>
+                          <td>{{ ingd.value['item']['category']['categorie'] }}</td>
+                          <td>{{ ingd.value['item']['itemName'] }}</td>
+                          <td>{{ ingd.value['openingStock']}}</td>
+                          <td>{{ ingd.value['unit']['unit'] }}</td>
+                          <td>
+                            <!-- <a class="btn btn-xs btn-info btn-circle">
+                              <i aria-hidden="true" class="fa fa-pencil"></i>
+                            </a> -->
+                            <a id="1" class="btn btn-xs btn-danger btn-circle" (click)="removeItem(i)">
+                              <i aria-hidden="true" class="fa fa-trash"></i>
+                            </a>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                    <button type="button" class="btn btn-primary" (click)="submit()">
+                      <i class="fa fa-floppy-o"></i> Save</button>
+                  </div>
+                </div>
+              </form>
+
+            </div>
+
+          </div>
+
+        </div>
+        <!---->
+      </div>
+      <div class="row openStock-table" *ngIf="!show" @slideIn>
+        <div class="col-md-12 table-responsive">
+          <div id="DataTables_Table_0_wrapper" class="dataTables_wrapper form-inline dt-bootstrap">
+            <div class="row">
+              <div class="col-sm-6">
+                <div class="dataTables_length" id="DataTables_Table_0_length">
+                  <label>Show
+                    <select name="DataTables_Table_0_length" [(ngModel)]="ddlitemsPerPage" (change)="setItemsPerPage()" aria-controls="DataTables_Table_0"
+                      class="form-control input-sm">
+                      <option value="10">10</option>
+                      <option value="25">25</option>
+                      <option value="50">50</option>
+                      <option value="100">100</option>
+                    </select> entries</label>
+                </div>
+              </div>
+              <div class="col-sm-6">
+                <div id="DataTables_Table_0_filter" class="dataTables_filter">
+                  <label>Search:
+                    <input type="search" #box (keyup.enter)="onEnter(box.value)" class="form-control input-sm" placeholder="" aria-controls="DataTables_Table_0">
+                  </label>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-sm-12">
+                <table class="table table-bordered table-striped datatable-paging-false dataTable">
+                  <thead>
+                    <tr role="row">
+                      <th>
+                        <a class="text-white" [routerLink]="['/master/opening_stock']" [queryParams]="sortDir == 'desc' && sortCol =='id' ?{sort:'id', dir:'asc' }:{sort:'id', dir:'desc'} ">#</a>
+                        <i class="{{ sortCol == 'id' && sortDir == 'desc' ? 'fa fa-sort-desc' : 'fa fa-sort-asc'}} pull-right" aria-hidden="true"></i>
+                      </th>
+                      <th>
+                        <a class="text-white" [routerLink]="['/master/opening_stock']" [queryParams]="sortDir == 'desc' && sortCol =='open_stock_date' ?{sort:'open_stock_date', dir:'asc' }:{sort:'open_stock_date', dir:'desc'} ">Opening St. Date</a>
+                        <i class="{{ sortCol == 'open_stock_date' && sortDir == 'desc' ? 'fa fa-sort-desc' : 'fa fa-sort-asc'}} pull-right" aria-hidden="true"></i>
+                      </th>
+                      <th>
+                        <a class="text-white" [routerLink]="['/master/opening_stock']" [queryParams]="sortDir == 'desc' && sortCol =='category' ?{sort:'category', dir:'asc' }:{sort:'category', dir:'desc'} ">Item Cat</a>
+                        <i class="{{ sortCol == 'category' && sortDir == 'desc' ? 'fa fa-sort-desc' : 'fa fa-sort-asc'}} pull-right" aria-hidden="true"></i>
+                      </th>
+                      <th>
+                        <a class="text-white" [routerLink]="['/master/opening_stock']" [queryParams]="sortDir == 'desc' && sortCol =='itemId' ?{sort:'itemId', dir:'asc' }:{sort:'itemId', dir:'desc'} ">Item Name</a>
+                        <i class="{{ sortCol == 'itemId' && sortDir == 'desc' ? 'fa fa-sort-desc' : 'fa fa-sort-asc'}} pull-right" aria-hidden="true"></i>
+                      </th>
+                      <th>
+                        <a class="text-white" [routerLink]="['/master/opening_stock']" [queryParams]="sortDir == 'desc' && sortCol =='openingStock' ?{sort:'openingStock', dir:'asc' }:{sort:'openingStock', dir:'desc'} ">Opening Stock</a>
+                        <i class="{{ sortCol == 'openingStock' && sortDir == 'desc' ? 'fa fa-sort-desc' : 'fa fa-sort-asc'}} pull-right" aria-hidden="true"></i>
+                      </th>
+                      <th>
+                        <a class="text-white" [routerLink]="['/master/opening_stock']" [queryParams]="sortDir == 'desc' && sortCol =='unitId' ?{sort:'unitId', dir:'asc' }:{sort:'unitId', dir:'desc'} ">Unit</a>
+                        <i class="{{ sortCol == 'unitId' && sortDir == 'desc' ? 'fa fa-sort-desc' : 'fa fa-sort-asc'}} pull-right" aria-hidden="true"></i>
+                      </th>
+                      <th>RG 1 Entry</th>
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr class="text-center" *ngIf="opening_stocks.length===0">
+                      <td colspan="8">No Records</td>
+                    </tr>
+                    <tr *ngFor="let opening_stock of opening_stocks | paginate: { itemsPerPage: itemsPerPage, currentPage: pageIndex , totalItems: totalItems}">
+                      <td>{{ opening_stock.id }}</td>
+                      <td>{{ opening_stock.open_stock_date | date :'yyyy-MM-dd' }}</td>
+                      <td>{{ opening_stock.item.category.categorie }}</td>
+                      <td>{{ opening_stock.item.itemName }}</td>
+                      <td>{{ opening_stock.openingStock }}</td>
+                      <td>{{ opening_stock.unit.unit }}</td>
+                      <td></td>
+                      <td style="width:12%">
+                        <a class="btn btn-xs btn-info btn-circle" (click)="getOpeningItemToEdit(opening_stock.id)">
+                          <i aria-hidden="true" class="fa fa-pencil"></i>
+                        </a>
+                        <a id="1" class="btn btn-xs btn-danger btn-circle" (click)="deleteOpeningStockItem(opening_stock.id)">
+                          <i aria-hidden="true" class="fa fa-trash"></i>
+                        </a>
+                      </td>
+                    </tr>
+                  </tbody>
+                  <!-- <tfoot class="showSearch">
+                    <tr>
+                      <th style="width: 10%;" rowspan="1" colspan="1">#</th>
+                      <th class="search" rowspan="1" colspan="1">
+                        <input type="text" class="form-control input-sm" placeholder=" opening st. Date">
+                      </th>
+                      <th class="search" rowspan="1" colspan="1">
+                        <input type="text" class="form-control input-sm" placeholder=" Item Cat">
+                      </th>
+                      <th class="search" rowspan="1" colspan="1">
+                        <input type="text" class="form-control input-sm" placeholder=" Item Name">
+                      </th>
+                      <th class="search" rowspan="1" colspan="1">
+                        <input type="text" class="form-control input-sm" placeholder=" Opening Stock">
+                      </th>
+                      <th class="search" rowspan="1" colspan="1">
+                        <input type="text" class="form-control input-sm" placeholder=" Unit">
+                      </th>
+                      <th class="search" rowspan="1" colspan="1">
+                        <input type="text" class="form-control input-sm" placeholder=" RG Entry">
+                      </th>
+                      <th rowspan="1" colspan="1">Actions</th>
+                    </tr>
+                  </tfoot> -->
+                </table>
+              </div>
+            </div>
+            <div class="pull-right">
+              <pagination-controls (pageChange)="getNextPageRecords($event)"></pagination-controls>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+
+  </section>
+</div>

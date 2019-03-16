@@ -1,0 +1,153 @@
+.th1 {
+  display: block;
+}
+
+tbody tr {
+  padding-left: 0px;
+  border-left: 3px solid #ededed;
+}
+
+.empworkingHours {
+  background-color: #f9f9f9;
+  /* text-align: center; */
+}
+
+.empoff {
+  background-color: #ef7667;
+  /* text-align: center; */
+}
+
+.checkInlbl {
+  color: #110f10;
+  background-color: #1fff83;
+  text-align: center;
+}
+
+.checkIn {
+  margin-top: 2px;
+  color: #110f10;
+  border: 2px solid #1fff83;
+  padding: 3px;
+  border-radius: 4px;
+  /* font-weight: 700; */
+  background-color: #1fff83;
+}
+
+.btn {}
+
+.notconfirmedlbl {
+  color: white;
+  background-color: rgb(115, 115, 197);
+  text-align: center;
+}
+
+.notconfirmed {
+  margin-top: 2px;
+  color: white;
+  border: 2px solid rgb(115, 115, 197);
+  padding: 3px;
+  border-radius: 4px;
+  /* font-weight: 700; */
+  background-color: rgb(115, 115, 197);
+}
+
+.appcancelled {
+  margin-top: 2px;
+  color: white;
+  border: 2px solid rgb(63, 63, 119);
+  padding: 3px;
+  border-radius: 4px;
+  /* font-weight: 700; */
+  background-color: rgb(22, 22, 48);
+}
+
+.appcancelledlbl {
+  color: white;
+  background-color: #4a4a4e;
+  text-align: center;
+}
+
+.iconcheckin {
+  float: right;
+}
+
+.tdtime {
+  background-color: #c6c6c6;
+  color: black;
+}
+
+tbody>tr>td {
+  cursor: pointer;
+}
+
+tbody>tr>td:hover {
+  /* border: 2px solid rgb(202, 196, 196); */
+  border-radius: 2px;
+}
+
+.ng2-opd-popup-content-main {
+  right: 9% !important;
+  top: 5% !important;
+}
+
+.clientImage {
+  height: 125px;
+  margin-top: 6px;
+}
+
+.dialogcontent {
+  height: 300px;
+}
+
+#toggle {
+  position: absolute;
+  top: 4%;
+  right: 15%;
+  z-index: 100;
+}
+
+.checkOut {
+  background-color: green;
+  color: white;
+  margin-top: 2px;
+  /* color: #110f10; */
+  /* border: aliceblue; */
+  padding: 3px;
+  border-radius: 4px;
+  /* font-weight: 700; */
+  /* background-color: #1fff83; */
+}
+
+.cancel {
+  background-color: #4a4a4e;
+  color: white;
+  padding: 3px;
+  margin-top: 2px;
+  border-radius: 4px;
+}
+
+.apptbl>tbody>tr>td,
+.apptbl>thead>tr>th>td {
+  border: 2px solid #c3a2c5b3 !important;
+}
+
+.thcustomer {
+  color: lime;
+}
+
+.thdate {
+  margin-top: 7px;
+}
+
+.customerServices {
+  text-align: left;
+  margin-left: 2px;
+}
+
+.stylist-image {
+  width: 43px;
+  height: 38px;
+  border-radius: 50%;
+  margin-right: 10px;
+  margin-top: -2px;
+}

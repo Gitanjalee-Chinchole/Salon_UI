@@ -1,0 +1,18 @@
+.dataTables_filter {
+  text-align: right;
+}
+
+tbody>tr {
+  border-left: 3px solid #f9f9f9;
+}
+
+a:hover,
+a:active,
+a:focus {
+  color: white;
+}
+
+.change-profile {
+  bottom: 18%;
+  left: 32%;
+}

@@ -1,0 +1,236 @@
+<popup>
+  <app-add-appointment #addAppointementComponent (passAppointmentDetails)="getAppointmentDetails($event)"></app-add-appointment>
+</popup>
+<div class="content-wrapper">
+  <!-- Content Header (Page header) -->
+  <div>
+    <toaster-container [toasterconfig]="config1"></toaster-container>
+  </div>
+  <section class="content-header">
+    <h1>
+      Appointments
+    </h1>
+    <ol class="breadcrumb">
+      <li>
+        <a routerLink="/dashboard">
+          <i class="fa fa-dashboard"></i> Dashboard</a>
+      </li>
+
+    </ol>
+  </section>
+  <section class="content">
+    <spinner-component [spinnerShow]="spinner">
+      <div class="spinner">
+        <div class="cube1"></div>
+        <div class="cube2"></div>
+      </div>
+    </spinner-component>
+    <div class="row">
+      <div class="col-md-12">
+        <div class="col-md-10">
+          <div *ngIf="!tableView" @slideIn>
+            <div class="col-md-6">
+              <h3 style="margin-left: 13px;">Stylist</h3>
+              <div class="col-md-4 text-center">
+                <div class="empworkingHours">Working Hours
+                </div>
+              </div>
+              <div class="col-md-4 text-center">
+                <div class="empoff">Off</div>
+              </div>
+
+            </div>
+            <div class="col-md-6">
+              <h3 style="margin-left: 13px;">Client</h3>
+              <div class="col-md-4">
+                <div class="checkInlbl">User Check In</div>
+              </div>
+              <div class="col-md-4" id="15/12/2017">
+                <div class="notconfirmedlbl">App. Not Confirmed</div>
+              </div>
+              <div class="col-md-4">
+                <div class="appcancelledlbl">App. Cancelled</div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+        <span style="display:none"></span>
+        <div class="col-md-2" style="margin-top: 45px;">
+          <div class="col-md-8" style="margin-top: 10px;">
+            <label style="text-align: left">Table View </label>
+          </div>
+          <div class="col-md-4" id="toggle">
+            <ui-switch switchColor="#f15555" defaultBgColor="white" (change)="viewChange($event)" [(ngModel)]="tableView"></ui-switch>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <span style="opacity: 0;">{{tableView}}</span>
+    <div *ngIf="!tableView" @slideIn>
+      <!-- <div class="row" style="margin-bottom:15px">
+        <div class="col-md-6">
+          <h3 style="margin-left: 13px;">Employee</h3>
+          <div class="col-md-6">
+            <div class="empworkingHours">Working Hours
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="empoff">Off</div>
+          </div>
+
+        </div>
+        <div class="col-md-6">
+          <h3 style="margin-left: 13px;">Client</h3>
+          <div class="col-md-6">
+            <div class="checkInlbl">User Check In</div>
+          </div>
+          <div class="col-md-6" id="15/12/2017">
+            <div class="notconfirmedlbl">App. Not Confirmed</div>
+          </div>
+          <div class="col-md-6" style="margin-top:15px">
+            <div class="appcancelledlbl">App. Cancelled</div>
+          </div>
+        </div>
+
+      </div> -->
+
+      <div class="row" style="margin-bottom:15px">
+        <div class="col-md-2">
+
+          <div class="">
+            <label style="margin-left:10px">Start Date : </label>
+            <my-date-picker name="anniversarydate" class="input-sm" [options]="myDatePickerOptions" (dateChanged)="onDateChanged($event)"
+              placeholder="Start Date" [selDate]="selDate" required></my-date-picker>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <label>Select Stylist : </label>
+          <select class="form-control input-sm" (change)="stylistChange()" [(ngModel)]="employee">
+            <option value="All">All</option>
+            <option *ngFor="let stylist of stylists" value="{{stylist.name}}">{{stylist.name}}</option>
+
+          </select>
+        </div>
+        <div class="col-md-3">
+          <label>Number Of Days : </label>
+          <select class="form-control input-sm" [(ngModel)]="days">
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+            <option value="5">5</option>
+            <option value="6">6</option>
+            <option value="7">7</option>
+          </select>
+        </div>
+        <div class="col-md-2" style="margin-top: 24px;">
+          <button class="btn bg-red input-sm" (click)="Show()">Show Appointments </button>
+          <button (click)="showModel()">Open Model</button>
+        </div>
+        <div class="col-md-2" style="margin-top: 20px;padding: 0px;">
+          <!-- <div class="col-md-6" style="margin-top: 10px;">
+            <label style="text-align: left">Table View :</label>
+          </div>
+          <div class="col-md-6">
+            <ui-switch switchColor="#f15555" defaultBgColor="white" (change)="viewChange($event)" [(ngModel)]="tableView"></ui-switch>
+          </div> -->
+        </div>
+      </div>
+      <!-- <div>
+      <div cp1>Click</div>
+    </div>
+    <button (click)="Add()">Add Appointment</button> -->
+      <div class="row">
+        <div class="col-md-12">
+          <table cp1 class="table table-stripped table-bordered apptbl" width="100%" border="0" cellpadding="0" cellspacing="0">
+            <thead>
+              <tr style="text-align: center;">
+                <td [innerHTML]="i" *ngFor="let i of tableHeader;let j=index">
+                </td>
+              </tr>
+              <!-- <tr *ngFor="let item of data.dates;let i=index">
+              <th id="{{i+1}}" #{{i+1}}> {{ item }} </th>
+              <th *ngIf="i==0;else other_content" [innerHTML]="data['data1']">
+              </th>
+              <th *ngIf="i==0;else other_content" [innerHTML]="data['data2']">
+              </th>
+              <ng-template #other_content>
+                <th></th>
+              </ng-template>
+            </tr> -->
+            </thead>
+            <tbody>
+              <tr *ngFor="let item of tableData">
+                <td style="width:4%;text-align:center"> {{ objectKeys(item) }} </td>
+                <ng-container *ngFor="let data of item[objectKeys(item)]">
+                  <td (dblclick)="addAppointment($event)" cp1 style="width:18%;" id="{{data + '_' + objectKeys(item) }}" class="empworkingHours"></td>
+                </ng-container>
+
+              </tr>
+              <!-- <tr style="text-align: center;" id="{{item.id}}" *ngFor="let item of data.dates;let i=index">
+              <td class="tdtime" id="{{i+1}}" [innerHTML]="item.value | safeDom"> </td>
+              <td cp1 title="Double click to add appointment" style="width:18%;" class="empworkingHours" *ngIf="i==0;else other_content"
+                [innerHTML]="data['data1']">
+              </td>
+              <td (dblclick)="addAppointment($event)" id="{{data['data2']}}" title="Double click to add appointment" style="width:18%;"
+                class="empworkingHours" *ngIf="i==0;else other_content" [innerHTML]="data['data2']">
+              </td>
+              <td style="width:18%;" class="empworkingHours" *ngIf="i==0;else other_content" [innerHTML]="data['data3']">
+              </td>
+              <td style="width:18%;" class="empworkingHours" *ngIf="i==0;else other_content" [innerHTML]="data['data4']">
+              </td>
+              <td style="width:18%;" class="empoff" *ngIf="i==0;else off" [innerHTML]="data['data5']">
+              </td>
+              <ng-template #off>
+                <td style="width:18%;" class="empoff"></td>
+              </ng-template>
+              <ng-template #other_content>
+                <td style="width:18%;" class="empworkingHours"></td>
+              </ng-template>
+            </tr> -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div class="row" *ngIf="tableView" @slideIn>
+      <div class="col-md-12">
+        <table class="table table-bordered">
+          <thead>
+            <tr>
+              <th>Sr.No</th>
+              <th>Customer</th>
+              <th>Appointment Time</th>
+              <th>Stylist</th>
+              <th>Status</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngIf="appointements === null">
+              <td colspan="5" class="text-center">No Appointements</td>
+            </tr>
+            <tr *ngFor="let appt of appointements;let i =index">
+              <td>{{ i+1 }}</td>
+              <td>{{ appt.customer.name }}</td>
+              <td> {{ appt.appointement_date }}</td>
+              <td> {{ appt.stylist.name }} </td>
+              <td>{{ appt.status }}</td>
+              <td>
+                <a href="javascript:void(0)" (click)="editAppointment(appt.id)" class="btn btn-xs btn-info btn-circle">
+                  <i aria-hidden="true" class="fa fa-pencil"></i>
+                </a>
+                <a href="javascript:void(0)" class="btn btn-xs btn-danger btn-circle ">
+                  <i aria-hidden="true" class="fa fa-trash"></i>
+                </a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+</div>

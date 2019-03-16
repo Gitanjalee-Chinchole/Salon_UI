@@ -1,0 +1,10 @@
+.btn-margin {
+    margin-left: 0px;
+}
+tbody>tr {
+    border-left: 3px solid #f9f9f9;
+  }
+  
+  th>a:hover {
+    color: white;
+  }
