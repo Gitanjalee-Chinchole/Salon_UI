@@ -1,9 +1,0 @@
-.dataTables_filter {
-  text-align: right;
-}
-.pitemsquantity.ng-invalid,
-.extraDiscount.ng-invalid,
-.pitemsrate.ng-invalid,
-.pitemscpvat.ng-invalid{
-  border: 1px solid red;
-}
